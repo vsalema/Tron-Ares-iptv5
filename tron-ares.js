@@ -85,6 +85,14 @@ const npSub = document.getElementById('npSub');
 const npBadge = document.getElementById('npBadge');
 const npCounter = document.getElementById('npCounter');
 
+// Counter: retire la classe d'animation une fois terminée (permet de rejouer l'effet à chaque update)
+if (npCounter) {
+  npCounter.addEventListener('animationend', (e) => {
+    if (e && e.animationName === 'npTick') npCounter.classList.remove('tick');
+  });
+}
+
+
 const sidebar = document.getElementById('sidebar');
 const toggleSidebarBtn = document.getElementById('toggleSidebarBtn');
 
@@ -792,7 +800,14 @@ function updateNowPlayingCounter() {
     pos = currentIndex >= 0 ? (currentIndex + 1) : 0;
   }
 
-  npCounter.textContent = total ? `${pos}/${total}` : '-/-';
+  const newText = total ? `${pos}/${total}` : '-/-';
+  if (npCounter.textContent !== newText) {
+    npCounter.textContent = newText;
+    // Tick animation sans reflow de layout (transform/opacity seulement)
+    npCounter.classList.remove('tick');
+    void npCounter.offsetWidth; // restart animation
+    npCounter.classList.add('tick');
+  }
 }
 
 
